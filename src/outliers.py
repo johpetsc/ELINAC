@@ -5,14 +5,13 @@ from sklearn.cluster import KMeans
 from sklearn.manifold import TSNE
 import matplotlib.pyplot as plt
 from scipy.spatial.distance import cdist
+pd.options.mode.chained_assignment = None
 
-def generate_data(x):
-    data = pd.read_excel('../dataset/output.xlsx')
-    cluster = data[(data['Cluster'] == x)]
+def generate_data(cluster):
     df = pd.DataFrame(columns=['val1', 'val2'])
     df['val1']  = cluster['Quantity']
     df['val2'] = cluster['Price']
-    print(cluster)
+    #print(cluster)
 
     return df, cluster
 
@@ -34,16 +33,29 @@ def K_means(X, df):
     center = kmeans.cluster_centers_
     distances = cdist(center, X, 'seuclidean')
     df['Distance'] = np.transpose(distances)
-    outliers = df[df['Distance'] >= np.percentile(df['Distance'], 95)]
-    inliers = df[df['Distance'] < np.percentile(df['Distance'], 95)]
-    print(outliers)
-    plot_outliers(outliers, inliers, center, df)
+    #outliers = df[df['Distance'] >= np.percentile(df['Distance'], 95)]
+    df.loc[df['Distance'] >= np.percentile(df['Distance'], 95), 'Outlier'] = 1
+    df = df.drop(columns='Distance')
+    #inliers = df[df['Distance'] < np.percentile(df['Distance'], 95)]
+    #print(outliers)
+    #plot_outliers(outliers, inliers, center, df)
+    
+    return df
 
 def main():
-    for x in range (8, 9):
-        df, data = generate_data(x)
+    data = pd.read_excel('../dataset/minioutput.xlsx')
+    data['Outlier'] = 0
+    for x in range (0, 2399):
+        cluster = data[(data['Cluster'] == x)]
+        print("Cluster: ", x)
+        if(cluster.shape[0] > 0): 
+            df, clusterData = generate_data(cluster)
 
-        K_means(df, data)
+            df = K_means(df, clusterData)
+
+            data[data['Cluster'] == x] = df
+
+    data.to_excel("../dataset/outliers.xlsx")
 
 if __name__ == '__main__':
     main()
