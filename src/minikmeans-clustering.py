@@ -5,7 +5,7 @@ from sklearn.manifold import TSNE
 import matplotlib.pyplot as plt
 
 def generate_data():
-    data = pd.read_excel('../dataset/dataset2.0.xlsx')
+    data = pd.read_excel('../dataset/dataset.xlsx')
     df = pd.DataFrame(columns=['Cluster', 'Text', 'Original', 'Quantity', 'Price'])
     df['Original']  = data['DESC']
     df['Quantity'] = data['QTD']
@@ -27,7 +27,7 @@ def generate_data():
 def K_means(X, df):
     vectorizer = TfidfVectorizer()
     X = vectorizer.fit_transform(X)
-    kmeans = MiniBatchKMeans(n_clusters=3000, random_state=0, verbose=1, batch_size=128)
+    kmeans = MiniBatchKMeans(n_clusters=2000, random_state=0, verbose=1, batch_size=128)
     model = kmeans.fit(X)
     pred_classes = kmeans.predict(X)
     X = X.todense()
@@ -38,7 +38,7 @@ def K_means(X, df):
     plt.show()
 
     df['Cluster'] = pred_classes
-    df.sort_values(by=['Cluster'])
+    df.sort_values(by=['Cluster']).reset_index(drop=True)
     df.to_excel("../dataset/output.xlsx")
     #pd.set_option('display.max_rows', None)
     #print(res.sort_values(by=['cluster']))
