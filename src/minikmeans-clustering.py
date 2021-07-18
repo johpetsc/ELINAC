@@ -27,7 +27,7 @@ def generate_data():
 def K_means(X, df):
     vectorizer = TfidfVectorizer()
     X = vectorizer.fit_transform(X)
-    kmeans = MiniBatchKMeans(n_clusters=2000, random_state=0, verbose=1, batch_size=128)
+    kmeans = MiniBatchKMeans(n_clusters=1564, random_state=0, verbose=1, batch_size=128)
     model = kmeans.fit(X)
     pred_classes = kmeans.predict(X)
     X = X.todense()
@@ -39,7 +39,9 @@ def K_means(X, df):
 
     df['Cluster'] = pred_classes
     df.sort_values(by=['Cluster']).reset_index(drop=True)
-    df.to_excel("../dataset/output.xlsx")
+
+    df.index.rename('id', inplace=True)
+    df.to_excel("../dataset/output_1.xlsx")
     #pd.set_option('display.max_rows', None)
     #print(res.sort_values(by=['cluster']))
     
